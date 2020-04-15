@@ -1,0 +1,119 @@
+<Ui
+  xmlns="http://www.blizzard.com/wow/ui"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+  <Script file="localization.de.lua" />
+  <Script file="localization.en.lua" />
+  <Script file="localization.fr.lua" />
+  <Script file="SimpleVictoryRushTracker.lua" />
+  <!-- Handles all events -->
+  <Frame name="svrt_EventHandler"
+         hidden="true">
+    <Scripts>
+      <OnLoad>
+        this:RegisterEvent("VARIABLES_LOADED");
+      </OnLoad>
+      <OnEvent>
+        if (event == "VARIABLES_LOADED") then
+          svrt_init();
+        end
+      </OnEvent>
+    </Scripts>
+  </Frame>
+  <!-- Shows an icon with current Victory Rush state -->
+  <Button name="svrt_Icon"
+          enableMouse="true"
+          movable="true"
+          resizable="true"
+          parent="UIParent"
+          frameStrata="HIGH"
+          hidden="false">
+  	<TitleRegion setAllPoints="true"/><!-- magic that makes the frame draggable -->
+    <Size><AbsDimension x="$svrt_DEFAULT_SIZE" y="$svrt_DEFAULT_SIZE"/></Size>
+    <Anchors><Anchor point="CENTER" /></Anchors>
+    <Backdrop bgFile="Interface\Icons\Ability_Warrior_Devastate"></Backdrop>
+  </Button>
+  <!-- Configuration window -->
+  <Frame name="svrt_ConfigFrame"
+         enableMouse="true"
+         movable="true"
+         toplevel="true"
+         parent="UIParent"
+         frameStrata="DIALOG"
+         hidden="true">
+  	<TitleRegion setAllPoints="true"/><!-- magic that makes the frame draggable -->
+    <!-- basic stuff -->
+    <Size><AbsDimension x="240" y="200"/></Size>
+    <Anchors><Anchor point="CENTER"/></Anchors>
+    <Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background"
+              edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+      <BackgroundInsets><AbsInset left="11" right="12" top="12" bottom="11"/></BackgroundInsets>
+      <TileSize><AbsValue val="32"/></TileSize>
+      <EdgeSize><AbsValue val="32"/></EdgeSize>
+    </Backdrop>
+    <!-- title -->
+    <Layers>
+      <Layer level="ARTWORK">
+        <Texture file="Interface\DialogFrame\UI-DialogBox-Header">
+          <Size><AbsDimension x="240" y="64"/></Size>
+          <Anchors>
+            <Anchor point="TOP"><Offset><AbsDimension x="0" y="12"/></Offset></Anchor>
+          </Anchors>
+        </Texture>
+      </Layer>
+      <Layer level="OVERLAY">
+        <FontString inherits="GameFontNormal" text="Victory Rush 1.1">
+          <Anchors><Anchor point="TOP" relativeTo="$parent"></Anchor></Anchors>
+        </FontString>
+      </Layer>
+    </Layers>
+    <Frames>
+      <!-- enabled-->
+      <CheckButton name="$parentCheckButtonEnabled" inherits="OptionsCheckButtonTemplate">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parent">
+            <Offset><AbsDimension x="20" y="-30"/></Offset>
+          </Anchor>
+        </Anchors>
+        <Scripts><OnClick>svrt_cnfNotify();</OnClick></Scripts>
+      </CheckButton>
+      <!-- play sound -->
+      <CheckButton name="$parentCheckButtonSound" inherits="OptionsCheckButtonTemplate">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parentCheckButtonEnabled">
+            <Offset><AbsDimension x="0" y="-30"/></Offset>
+          </Anchor>
+        </Anchors>
+        <Scripts><OnClick>svrt_cnfNotify();</OnClick></Scripts>
+      </CheckButton>
+      <Slider name="$parentSliderSize" inherits="OptionsSliderTemplate">
+        <Size><AbsDimension x="200" y="16"/></Size>
+      <Anchors>
+        <Anchor point="TOPLEFT" relativeTo="$parentCheckButtonSound">
+          <Offset><AbsDimension x="0" y="-40"/></Offset>
+        </Anchor>
+			</Anchors>
+			<Scripts>
+				<OnLoad>
+					getglobal(this:GetName().."Low"):SetText("16");
+					getglobal(this:GetName().."High"):SetText("128");
+					this:SetMinMaxValues(16,128);
+					this:SetValueStep(8);
+				</OnLoad>
+				<OnValueChanged>svrt_cnfNotify();</OnValueChanged>
+			</Scripts>
+		</Slider>
+      <!-- cose window -->
+      <Button name="$parentButtonClose" inherits="OptionsButtonTemplate" text="Close">
+        <Anchors>
+          <Anchor point="BOTTOMRIGHT"><Offset><AbsDimension x="-12" y="16"/></Offset></Anchor>
+        </Anchors>
+        <Scripts><OnClick>svrt_ConfigFrame:Hide();</OnClick></Scripts>
+      </Button>
+    </Frames>
+    <Scripts>
+      <OnShow>PlaySound("igCharacterInfoOpen");svrt_cnfOnShow();</OnShow>
+      <OnHide>PlaySound("igCharacterInfoClose");</OnHide>
+    </Scripts>
+  </Frame>
+</Ui>
